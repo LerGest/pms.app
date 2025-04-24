@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Prescription #{{ prescription.id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Prescription Details</h2>
+    <a href="{{ url_for('prescriptions') }}" class="btn btn-secondary">Back to Prescriptions</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Prescription Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <p><strong>Patient:</strong> {{ prescription.patient.last_name }}, {{ prescription.patient.first_name }}</p>
+                        <p><strong>Date Prescribed:</strong> {{ prescription.date_prescribed.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Prescriber:</strong> {{ prescription.prescriber.username }}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="badge 
+                                {% if prescription.status == 'approved' %}bg-success
+                                {% elif prescription.status == 'pending' %}bg-warning
+                                {% elif prescription.status == 'denied' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ prescription.status|capitalize }}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <h5 class="mt-4">Medications</h5>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Medication</th>
+                            <th>Dosage</th>
+                            <th>Frequency</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in prescription.items %}
+                        <tr>
+                            <td>{{ item.medication.name }} ({{ item.medication.strength }})</td>
+                            <td>{{ item.dosage }}</td>
+                            <td>{{ item.frequency }}</td>
+                            <td>{{ item.duration or 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                {% if prescription.instructions %}
+                <h5 class="mt-4">Instructions</h5>
+                <p>{{ prescription.instructions }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if current_user.role == 'teacher' and prescription.status == 'pending' %}
+                <a href="{{ url_for('approve_prescription', id=prescription.id) }}" class="btn btn-success w-100 mb-2">Approve Prescription</a>
+                {% endif %}
+                
+                <button class="btn btn-primary w-100 mb-2">Print Prescription</button>
+                
+                {% if current_user.role == 'teacher' %}
+                <button class="btn btn-warning w-100 mb-2">Edit Prescription</button>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Patient Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ prescription.patient.last_name }}, {{ prescription.patient.first_name }}</p>
+                <p><strong>DOB:</strong> {{ prescription.patient.dob.strftime('%Y-%m-%d') }}</p>
+                <p><strong>Age:</strong> {{ (datetime.now().year - prescription.patient.dob.year) - ((datetime.now().month, datetime.now().day) < (prescription.patient.dob.month, prescription.patient.dob.day)) }}</p>
+                <p><strong>Gender:</strong> {{ prescription.patient.gender|capitalize }}</p>
+                <p><strong>Blood Type:</strong> {{ prescription.patient.blood_type or 'Unknown' }}</p>
+                
+                {% if prescription.patient.allergies %}
+                <p><strong>Allergies:</strong> {{ prescription.patient.allergies }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
