@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Patients</h5>
+                <p class="card-text display-6">{{ stats.patient_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Medications</h5>
+                <p class="card-text display-6">{{ stats.medication_count }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-info mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Active Rx</h5>
+                <p class="card-text display-6">{{ stats.active_prescriptions }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-warning mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Low Stock</h5>
+                <p class="card-text display-6">{{ stats.low_stock }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Patients by Gender</h5>
+            </div>
+            <div class="card-body">
+                <div id="genderChart"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Medications by Dosage Form</h5>
+            </div>
+            <div class="card-body">
+                <div id="formChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            // Gender Chart
+            var genderGraph = JSON.parse('{{ gender_graph|safe }}');
+            if (genderGraph.data && genderGraph.layout) {
+                Plotly.newPlot('genderChart', genderGraph.data, genderGraph.layout);
+            } else {
+                console.error("Invalid gender graph data");
+            }
+            
+            // Form Chart
+            var formGraph = JSON.parse('{{ form_graph|safe }}');
+            if (formGraph.data && formGraph.layout) {
+                Plotly.newPlot('formChart', formGraph.data, formGraph.layout);
+            } else {
+                console.error("Invalid form graph data");
+            }
+        } catch (error) {
+            console.error("Error rendering charts:", error);
+        }
+    });
+</script>
+{% endblock %}
