@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Prescriptions{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Prescription Management</h2>
+
+{% if current_user.role == 'teacher' %}
+<div class="mb-3">
+    <a href="{{ url_for('create_prescription') }}" class="btn btn-primary">Create New Prescription</a>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Prescription List</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Patient</th>
+                        <th>Medications</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rx in prescriptions %}
+                    <tr>
+                        <td>{{ rx.date_prescribed.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ rx.patient.last_name }}, {{ rx.patient.first_name }}</td>
+                        <td>
+                            {% for item in rx.items %}
+                                {{ item.medication.name }} ({{ item.dosage }})<br>
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <span class="badge 
+                                {% if rx.status == 'approved' %}bg-success
+                                {% elif rx.status == 'pending' %}bg-warning
+                                {% elif rx.status == 'denied' %}bg-danger
+                                {% else %}bg-secondary{% endif %}">
+                                {{ rx.status|capitalize }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-info">View</a>
+                            {% if current_user.role == 'teacher' and rx.status == 'pending' %}
+                            <a href="{{ url_for('approve_prescription', id=rx.id) }}" class="btn btn-sm btn-success">Approve</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
