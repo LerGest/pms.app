@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Patients{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Patient Management</h2>
+
+{% if current_user.role == 'teacher' %}
+<div class="mb-3">
+    <a href="{{ url_for('add_patient') }}" class="btn btn-primary">Add New Patient</a>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Patient List</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>DOB</th>
+                        <th>Gender</th>
+                        <th>Blood Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td>{{ patient.patient_id }}</td>
+                        <td>{{ patient.last_name }}, {{ patient.first_name }}</td>
+                        <td>{{ patient.dob.strftime('%Y-%m-%d') }}</td>
+                        <td>{{ patient.gender }}</td>
+                        <td>{{ patient.blood_type or 'N/A' }}</td>
+                        <td>
+                            <a href="{{ url_for('view_patient', id=patient.id) }}" class="btn btn-sm btn-info">View</a>
+                            {% if current_user.role == 'teacher' %}
+                            <a href="#" class="btn btn-sm btn-warning">Edit</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
