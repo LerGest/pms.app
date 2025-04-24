@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}Clinical Calculators{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Clinical Calculators</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>BMI Calculator</h5>
+            </div>
+            <div class="card-body">
+                <form id="bmiForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="weight" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight" step="0.1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="height" class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="height" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                </form>
+                <div id="bmiResult" class="mt-3" style="display: none;">
+                    <h5>Result</h5>
+                    <p>BMI: <span id="bmiValue"></span> (<span id="bmiCategory"></span>)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Creatinine Clearance (CrCl)</h5>
+            </div>
+            <div class="card-body">
+                <form id="ccrForm">
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="age" class="form-label">Age</label>
+                            <input type="number" class="form-control" id="age" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="weight_ccr" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight_ccr" step="0.1" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="scr" class="form-label">Serum Creatinine (mg/dL)</label>
+                            <input type="number" class="form-control" id="scr" step="0.1" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gender</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender_ccr" id="male" value="male" checked>
+                                <label class="form-check-label" for="male">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender_ccr" id="female" value="female">
+                                <label class="form-check-label" for="female">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                </form>
+                <div id="ccrResult" class="mt-3" style="display: none;">
+                    <h5>Result</h5>
+                    <p>Creatinine Clearance: <span id="ccrValue"></span> mL/min</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Ideal Body Weight (IBW)</h5>
+            </div>
+            <div class="card-body">
+                <form id="ibwForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="height_ibw" class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="height_ibw" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gender</label>
+                        <div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender_ibw" id="male_ibw" value="male" checked>
+                                <label class="form-check-label" for="male_ibw">Male</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender_ibw" id="female_ibw" value="female">
+                                <label class="form-check-label" for="female_ibw">Female</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                </form>
+                <div id="ibwResult" class="mt-3" style="display: none;">
+                    <h5>Result</h5>
+                    <p>Ideal Body Weight: <span id="ibwValue"></span> kg</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Body Surface Area (BSA)</h5>
+            </div>
+            <div class="card-body">
+                <form id="bsaForm">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="weight_bsa" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight_bsa" step="0.1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="height_bsa" class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="height_bsa" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                </form>
+                <div id="bsaResult" class="mt-3" style="display: none;">
+                    <h5>Result</h5>
+                    <p>Body Surface Area: <span id="bsaValue"></span> m²</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // BMI Calculator
+        document.getElementById('bmiForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const weight = parseFloat(document.getElementById('weight').value);
+            const height = parseFloat(document.getElementById('height').value);
+            
+            fetch("{{ url_for('calculate_bmi') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    weight: weight,
+                    height: height
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('bmiValue').textContent = data.result;
+                    document.getElementById('bmiCategory').textContent = data.category;
+                    document.getElementById('bmiResult').style.display = 'block';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        });
+
+        // Creatinine Clearance Calculator
+        document.getElementById('ccrForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const age = parseInt(document.getElementById('age').value);
+            const weight = parseFloat(document.getElementById('weight_ccr').value);
+            const scr = parseFloat(document.getElementById('scr').value);
+            const gender = document.querySelector('input[name="gender_ccr"]:checked').value;
+            
+            fetch("{{ url_for('calculate_ccr') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    age: age,
+                    weight: weight,
+                    scr: scr,
+                    gender: gender
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('ccrValue').textContent = data.result;
+                    document.getElementById('ccrResult').style.display = 'block';
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        });
+
+        // Ideal Body Weight Calculator
+        document.getElementById('ibwForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const height = parseFloat(document.getElementById('height_ibw').value);
+            const gender = document.querySelector('input[name="gender_ibw"]:checked').value;
+            
+            let ibw;
+            if (gender === 'male') {
+                ibw = 50 + (0.91 * (height - 152.4));
+            } else {
+                ibw = 45.5 + (0.91 * (height - 152.4));
+            }
+            
+            document.getElementById('ibwValue').textContent = ibw.toFixed(2);
+            document.getElementById('ibwResult').style.display = 'block';
+        });
+
+        // Body Surface Area Calculator
+        document.getElementById('bsaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const weight = parseFloat(document.getElementById('weight_bsa').value);
+            const height = parseFloat(document.getElementById('height_bsa').value);
+            
+            const bsa = Math.sqrt((height * weight) / 3600);
+            
+            document.getElementById('bsaValue').textContent = bsa.toFixed(2);
+            document.getElementById('bsaResult').style.display = 'block';
+        });
+    });
+</script>
+{% endblock %}
