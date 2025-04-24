@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Medications{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Medication Management</h2>
+
+{% if current_user.role == 'teacher' %}
+<div class="mb-3">
+    <a href="{{ url_for('add_medication') }}" class="btn btn-primary">Add New Medication</a>
+</div>
+{% endif %}
+
+{% if low_stock %}
+<div class="alert alert-warning mb-4">
+    <h5>Low Stock Medications</h5>
+    <ul class="mb-0">
+        {% for med in low_stock %}
+        <li>{{ med.name }} ({{ med.strength }}) - {{ med.quantity }} remaining (Reorder at {{ med.reorder_level }})</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Medication Inventory</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Generic Name</th>
+                        <th>Dosage Form</th>
+                        <th>Strength</th>
+                        <th>Quantity</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for med in medications %}
+                    <tr class="{% if med.quantity <= med.reorder_level %}table-warning{% endif %}">
+                        <td>{{ med.name }}</td>
+                        <td>{{ med.generic_name or 'N/A' }}</td>
+                        <td>{{ med.dosage_form or 'N/A' }}</td>
+                        <td>{{ med.strength or 'N/A' }}</td>
+                        <td>{{ med.quantity }}</td>
+                        <td>
+                            <a href="#" class="btn btn-sm btn-info">View</a>
+                            {% if current_user.role == 'teacher' %}
+                            <a href="#" class="btn btn-sm btn-warning">Edit</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
