@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.first_name }} {{ patient.last_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{{ patient.first_name }} {{ patient.last_name }} ({{ patient.patient_id }})</h2>
+    <a href="{{ url_for('patients') }}" class="btn btn-secondary">Back to Patients</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Demographics</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Date of Birth:</strong> {{ patient.dob.strftime('%Y-%m-%d') }}</p>
+                <p><strong>Age:</strong> {{ (datetime.now().year - patient.dob.year) - ((datetime.now().month, datetime.now().day) < (patient.dob.month, patient.dob.day)) }}</p>
+                <p><strong>Gender:</strong> {{ patient.gender|capitalize }}</p>
+                <p><strong>Blood Type:</strong> {{ patient.blood_type or 'Unknown' }}</p>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Allergies</h5>
+            </div>
+            <div class="card-body">
+                {% if patient.allergies %}
+                    {{ patient.allergies|replace('\n', '<br>')|safe }}
+                {% else %}
+                    <p class="text-muted">No known allergies</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5>Medical History</h5>
+                <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">Add Note</button>
+            </div>
+            <div class="card-body">
+                {% if patient.medical_history %}
+                    {{ patient.medical_history|replace('\n', '<br>')|safe }}
+                {% else %}
+                    <p class="text-muted">No medical history recorded</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Clinical Notes</h5>
+            </div>
+            <div class="card-body">
+                {% if clinical_notes %}
+                    <div class="list-group">
+                        {% for note in clinical_notes %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ note.note_type|capitalize }} Note</h6>
+                                <small>{{ note.date.strftime('%Y-%m-%d %H:%M') }}</small>
+                            </div>
+                            <p class="mb-1">{{ note.content }}</p>
+                            <small class="text-muted">By {{ note.author.username }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No clinical notes</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5>Prescriptions</h5>
+            </div>
+            <div class="card-body">
+                {% if prescriptions %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Medications</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for rx in prescriptions %}
+                                <tr>
+                                    <td>{{ rx.date_prescribed.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        {% for item in rx.items %}
+                                            {{ item.medication.name }} ({{ item.dosage }})<br>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        <span class="badge 
+                                            {% if rx.status == 'approved' %}bg-success
+                                            {% elif rx.status == 'pending' %}bg-warning
+                                            {% elif rx.status == 'denied' %}bg-danger
+                                            {% else %}bg-secondary{% endif %}">
+                                            {{ rx.status|capitalize }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="#" class="btn btn-sm btn-info">View</a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No prescriptions</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Note Modal -->
+<div class="modal fade" id="addNoteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Clinical Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('add_clinical_note', patient_id=patient.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="note_type" class="form-label">Note Type</label>
+                        <select class="form-select" id="note_type" name="note_type" required>
+                            <option value="progress">Progress Note</option>
+                            <option value="assessment">Assessment</option>
+                            <option value="plan">Plan</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Content</label>
+                        <textarea class="form-control" id="content" name="content" rows="5" required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Note</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
