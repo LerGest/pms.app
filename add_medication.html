@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Add Medication{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Add New Medication</h2>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="name" class="form-label">Brand Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="generic_name" class="form-label">Generic Name</label>
+                    <input type="text" class="form-control" id="generic_name" name="generic_name">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="dosage_form" class="form-label">Dosage Form</label>
+                    <select class="form-select" id="dosage_form" name="dosage_form">
+                        <option value="">Select...</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="capsule">Capsule</option>
+                        <option value="injection">Injection</option>
+                        <option value="solution">Solution</option>
+                        <option value="suspension">Suspension</option>
+                        <option value="cream">Cream</option>
+                        <option value="ointment">Ointment</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="strength" class="form-label">Strength</label>
+                    <input type="text" class="form-control" id="strength" name="strength" placeholder="e.g., 500mg, 10mg/mL">
+                </div>
+                <div class="col-md-4">
+                    <label for="manufacturer" class="form-label">Manufacturer</label>
+                    <input type="text" class="form-control" id="manufacturer" name="manufacturer">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="quantity" class="form-label">Quantity</label>
+                    <input type="number" class="form-control" id="quantity" name="quantity" min="0" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="reorder_level" class="form-label">Reorder Level</label>
+                    <input type="number" class="form-control" id="reorder_level" name="reorder_level" min="0" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="indications" class="form-label">Indications</label>
+                <textarea class="form-control" id="indications" name="indications" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="contraindications" class="form-label">Contraindications</label>
+                <textarea class="form-control" id="contraindications" name="contraindications" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label for="side_effects" class="form-label">Side Effects</label>
+                <textarea class="form-control" id="side_effects" name="side_effects" rows="3"></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Medication</button>
+            <a href="{{ url_for('medications') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
